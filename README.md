@@ -1,13 +1,13 @@
 # ShellcodeEncryptor
 A simple shell code encryptor/decryptor/executor to bypass anti virus.
 
-**Purpose**
+# Purpose
 To generate a .Net binary containing base64 encoded, AES encrypted shellcode that will execute on a target, bypassing anti-virus.
 
 If you find the workflow a little cumbersome, feel free to take the code and make something useful of it, but to quote a famous philosopher:
 > Life moves pretty fast. If you don't stop and look around once in a while, you could miss it.
 
-**Instructions**
+# Instructions
 
 Create a meterpreter payload using `msfvenom`:
 ```
