@@ -49,7 +49,7 @@ namespace Launcher
             RunShellcode(dec_shellcode);
         }
 
-        // uncomment if using alteranet method
+        // uncomment if using alternate method
         //delegate void PrototypeFunc();
         
         public static void RunShellcode(byte[] shellcode)
