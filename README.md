@@ -26,5 +26,5 @@ Hopefully you will have a nice meterpreter shell.
 
 # Notes
 
-The .cs files are provided as a reference.
+The `builder.cs` file is provided as a reference.
 Tested with x86 windows/meterpreter/reverse_tcp
