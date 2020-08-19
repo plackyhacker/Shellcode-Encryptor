@@ -14,6 +14,7 @@ def main():
 	arch = args.arch
 	base64only = args.base64only
 	method = args.method
+	obfuscate = args.obfuscate
 
 	''' generate msfvenom payload '''
 	print("[+] Generating MSFVENOM payload...")
@@ -45,8 +46,10 @@ def main():
 	template =  template.replace('~KEY~', key)
 
 	''' obfuscating the code '''
-	print("[!] Obfscating the code...")
-	print("    Be patient! I'm working on it ok!!!")
+	if(obfuscate == True):
+		print("[!] Obfscating the code...")
+		print("    Be patient! I'm working on it ok!!!")
+		print("    Should be implemented soon!")
 
 	''' include required code based on method '''
 	if(method == "delegate"):
