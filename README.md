@@ -52,4 +52,4 @@ optional arguments:
 # Notes
 
 https://github.com/plackyhacker/ShellcodeEncryptor/blob/master/launcher.cs is provided as a reference.
-Tested with x86 windows/meterpreter/reverse_tcp
+Tested with x86 windows/meterpreter/reverse_tcp on Windows 10 with Defender.
