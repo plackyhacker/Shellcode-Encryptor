@@ -125,7 +125,7 @@ def parse_args():
 	return parser.parse_args()
 
 def get_random_string(length):
-	letters = string.ascii_lowercase
+	letters = string.ascii_letters + string.digits
 	result_str = ''.join(random.choice(letters) for i in range(length))
 	return result_str
 
