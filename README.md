@@ -28,5 +28,5 @@ Hopefully you will have a nice meterpreter shell.
 
 # Notes
 
-The `builder.cs` file is provided as a reference.
+https://github.com/plackyhacker/ShellcodeEncryptor/blob/master/launcher.cs is provided as a referencefor the method used.
 Tested with x86 windows/meterpreter/reverse_tcp
