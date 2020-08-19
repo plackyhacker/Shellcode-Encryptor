@@ -1,7 +1,7 @@
 # ShellcodeEncryptor
 A simple shell code encryptor/decryptor/executor to bypass anti virus.
 
-![](https://raw.githubusercontent.com/plackyhacker/ShellcodeEncryptor/master/demo.gif)
+<img src="https://raw.githubusercontent.com/plackyhacker/ShellcodeEncryptor/master/demo.gif" alt="Demo " style="zoom:150%;" />
 
 # Purpose
 To generate a .Net binary containing base64 encoded, AES encrypted shellcode that will execute on a Windows target, bypassing anti-virus.
