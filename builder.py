@@ -29,12 +29,6 @@ def main():
 	f = open("./msf.bin", "rb")
 	buf = f.read()
 
-
-	''' buf = result.stdout '''
-
-	print(buf)
-	return
-
 	''' encrypt the payload '''
 	print("[+] Encrypting the payload, key=" + key + "...")
 	hkey = hash_key(key)
