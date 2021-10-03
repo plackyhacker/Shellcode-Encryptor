@@ -38,7 +38,7 @@ namespace ProcessInjection
 
         static void Shellcode()
         {
-            // attempt heuristics/behviour bypass
+            // attempt heuristics/behaviour bypass
             IntPtr mem = VirtualAllocExNuma(System.Diagnostics.Process.GetCurrentProcess().Handle, IntPtr.Zero, 0x1000, 0x3000, 0x4, 0);
             if (mem == null)
             {
