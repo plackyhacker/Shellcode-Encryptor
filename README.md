@@ -75,6 +75,12 @@ optional arguments:
                         The format to output.
   ```
 
+# AV Scan Results
+
+The binary was scanned using [antiscan.me](https://antiscan.me/scan/new/result?id=gn0muzwLOUOc) on 03/10/2021.
+
+![AV Scan](https://github.com/plackyhacker/ShellcodeEncryptor/blob/master/scan.png?raw=true)
+
 # Notes
 
 Tested with windows/x64/meterpreter/reverse_https on Windows 10 Pro (build 10.0.19042)with Defender.
