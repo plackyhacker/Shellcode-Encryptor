@@ -83,4 +83,4 @@ The binary was scanned using [antiscan.me](https://antiscan.me/scan/new/result?i
 
 # Notes
 
-Tested with windows/x64/meterpreter/reverse_https on Windows 10 Pro (build 10.0.19042)with Defender.
+Tested with windows/x64/meterpreter/reverse_https on Windows 10 Pro (build 10.0.19042) with Defender.
